@@ -1,0 +1,39 @@
+version: '3.2'
+services:
+  php-fpm:
+    build: ./docker/php
+    image: jefffrade/minhas-importacoes-crawler:php-fpm
+    restart: on-failure
+    container_name: minhas-importacoes-crawler-php-fpm
+    command: php-fpm
+    links:
+      - mysql
+    volumes:
+      - ./:/minhas-importacoes-crawler
+    healthcheck:
+      test: ['CMD', 'sh', '-c', 'netstat -an | fgrep 9000 | fgrep -q LISTEN']
+      interval: 10s
+      timeout: 5s
+      retries: 2
+
+  mysql:
+    build: ./docker/mysql
+    image: jefffrade/minhas-importacoes-crawler:mysql
+    restart: on-failure
+    container_name: minhas-importacoes-crawler-mysql
+    volumes:
+      - "${DOCKER_DATA_PATH}/mysql:/var/lib/mysql"
+    command:
+      - "--innodb_use_native_aio=0"
+    ports:
+      - "${DB_PORT}:3306"
+    expose:
+      - "${DB_PORT}"
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ['CMD', 'sh', '-c', 'netstat -an | fgrep 3306 | fgrep -q LISTEN']
+      interval: 10s
+      timeout: 5s
+      retries: 2
