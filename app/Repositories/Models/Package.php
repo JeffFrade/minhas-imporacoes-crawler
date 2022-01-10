@@ -14,6 +14,7 @@ class Package extends Model
      */
     protected $fillable = [
         'tracking_number',
-        'status'
+        'status',
+        'date'
     ];
 }
