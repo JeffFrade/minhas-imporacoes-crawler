@@ -148,6 +148,10 @@ class CrawlerStart extends Command
         $this->getPackagesTableRows($table);
     }
 
+    /**
+     * @param string $table
+     * @return void
+     */
     private function getPackagesTableRows(string $table)
     {
         $rows = StringHelper::doRegex($table, '/<tr><td[\w\W]+?<\/tr>/i');
@@ -162,11 +166,14 @@ class CrawlerStart extends Command
 
             if ($package === false) {
                 $this->package->storePackage($trackingNumber, $status, $date);
-                $this->sendEmail();
+                $this->sendEmail($trackingNumber);
                 continue;
             }
 
-            dump("Ok");
+            if ($status != $package->status) {
+                $this->package->updateStatus($trackingNumber, $status, $date);
+                $this->sendEmail($trackingNumber);
+            }
         }
     }
 
@@ -265,10 +272,12 @@ class CrawlerStart extends Command
     }
 
     /**
+     * @param string $trackingNumber
      * @return void
      */
-    private function sendEmail()
+    private function sendEmail(string $trackingNumber)
     {
-        Mail::to(env('MAIL_FROM_ADDRESS'))->send(new PackageStatus());
+        $package = $this->package->getPackageByTrackingNumber($trackingNumber);
+        Mail::to(env('MAIL_FROM_ADDRESS'))->send(new PackageStatus($package));
     }
 }

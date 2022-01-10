@@ -44,4 +44,20 @@ class Package
 
         $this->packageRepository->create($data);
     }
+
+    /**
+     * @param string $trackingNumber
+     * @param string $status
+     * @param string $date
+     * @return void
+     */
+    public function updateStatus(string $trackingNumber, string $status, string $date)
+    {
+        $data = [
+            'status' => $status,
+            'date' => $date
+        ];
+
+        $this->packageRepository->updateCustom($data, 'tracking_number', $trackingNumber);
+    }
 }
