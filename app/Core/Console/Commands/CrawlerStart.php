@@ -64,11 +64,8 @@ class CrawlerStart extends Command
         try {
             $this->login();
             $this->getPackagesInfo();
-
             $this->info('Crawler Executed!');
-            Log::info('Crawler Executed!');
         } catch (GuzzleException $e) {
-            dump($e->getMessage());
             $this->error('Error in HTTP Client');
         } finally {
             unset($this->httpClient);
