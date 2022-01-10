@@ -17,6 +17,7 @@ class CreatePackagesTable extends Migration
             $table->id();
             $table->char('tracking_number', 13)->unique();
             $table->string('status', 50);
+            $table->date('date');
             $table->timestamps();
             $table->softDeletes();
         });
