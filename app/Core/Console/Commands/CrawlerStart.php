@@ -5,11 +5,13 @@ namespace App\Core\Console\Commands;
 use App\Helpers\DateHelper;
 use App\Helpers\FileHelper;
 use App\Helpers\StringHelper;
+use App\Mail\PackageStatus;
 use App\Services\HttpClient;
 use App\Services\Package;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class CrawlerStart extends Command
 {
@@ -156,10 +158,15 @@ class CrawlerStart extends Command
             $trackingNumber = $rowData[1];
             $status = $rowData[4];
             $date = DateHelper::parse($rowData[5]);
+            $package = $this->existsTrackingNumberInDatabase($trackingNumber);
 
-            if ($this->existsTrackingNumberInDatabase($trackingNumber) === false) {
+            if ($package === false) {
                 $this->package->storePackage($trackingNumber, $status, $date);
+                $this->sendEmail();
+                continue;
             }
+
+            dump("Ok");
         }
     }
 
@@ -175,14 +182,14 @@ class CrawlerStart extends Command
 
     /**
      * @param string $trackingNumber
-     * @return bool
+     * @return false|mixed
      */
-    private function existsTrackingNumberInDatabase(string $trackingNumber): bool
+    private function existsTrackingNumberInDatabase(string $trackingNumber)
     {
         $package = $this->package->getPackageByTrackingNumber($trackingNumber);
 
         if (!empty($package)) {
-            return true;
+            return $package;
         }
 
         return false;
@@ -255,5 +262,13 @@ class CrawlerStart extends Command
     {
         $viewState = StringHelper::doRegex($content, '/viewstate\"[\w\W]value=\"([\w\W]+?)\"/i');
         $this->viewState = $viewState[1][0];
+    }
+
+    /**
+     * @return void
+     */
+    private function sendEmail()
+    {
+        Mail::to(env('MAIL_FROM_ADDRESS'))->send(new PackageStatus());
     }
 }
