@@ -1,66 +1,39 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Minhas Importações Crawler
+---
+Esse projeto é um crawler que navega no sistema Minhas Importações da Empresa Brasileira de Correios e Telégrafos (Correios).
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Stack
+---
+O ambiente foi criado em containers (Com o `Docker`).
+Foi utilizada a seguinte stack para o projeto:
 
-## About Laravel
+- `Laravel >= 8`
+- `PHP >= 7.4`
+- `MySQL >= 5`
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Como Configurar:
+---
+Para configurar o projeto, basta executar o script `config.sh`, que todo o ambiente será montado.
+Também é necessário preencher algumas variáveis no `.env` após executar o `config.sh`.
+Sendo as seguintes variáveis:
+- `MAIL_MAILER` = SMTP/POP (Depende do protocolo que prefere utilizar).
+- `MAIL_HOST`= Host do SMTP/POP que pretende utilizar.
+- `MAIL_PORT` = Porta do SMTP/POP desejado.
+- `MAIL_USERNAME` = E-mail que fará os disparos.
+- `MAIL_PASSWORD` = Senha do e-mail que fará os disparos.
+- `MAIL_ENCRYPTION` = Criptografia do e-mail (Geralmente utiliza-se TLS mesmo, não há necessidade de alterar muitas vezes).
+- `MAIL_FROM_ADDRESS` = Qual o e-mail que receberá os alertas.
+- `MINHAS_IMPORTACOES_USERNAME` = Usuário que utiliza para logar no sistema do Minhas Importações.
+- `MINHAS_IMPORTACOES_PASSWORD` = Senha que utiliza para logar no sistema do Minhas Importações.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Vale ressaltar que nenhuma dessas informações será jogada na WEB, apenas são necessárias para o crawler conseguir trabalhar.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+E também adicionar a seguinte linha ao `crontab` (Caso queira que o robô rode de forma automática a cada intervalo de tempo):
+- `* * * * * docker exec minhas-importacoes-crawler-php-fpm php artisan schedule:run >> /dev/null 2>&1`
 
-## Learning Laravel
+Para acessar o `crontab` em ambientes `Linux`, basta digitar `crontab -e` e colar a linha acima.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Como executar o Crawler
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[CMS Max](https://www.cmsmax.com/)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-- **[Romega Software](https://romegasoftware.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Uma vez que tudo esteja configurado, basta executar o script `run-crawler.sh` que o robô executará.
